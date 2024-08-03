@@ -11,3 +11,34 @@ Json2Sheet json2Sheet = new Json2Sheet();
 // URL, FilePath + FileName
 json2Sheet.convertHttpResponseJsonToExcelToFilePath("https://jsonplaceholder.typicode.com/comments", "test.xlsx");
 ```
+Result
+![image](https://github.com/user-attachments/assets/ecaf973b-4d68-482b-b57a-d6951c152566)
+
+### File 경로
+
+``` JAVA
+    Json2Sheet json2Sheet = new Json2Sheet();
+    json2Sheet.convertJsonToExcelToFilePath("./test.json", "testWithFile.xlsx");
+```
+
+test.json
+``` JSON
+[
+  {
+    "name": "John Doe",
+    "age": 30
+  },
+  {
+    "name": "Jane Smith",
+    "age": 25
+  },
+  {
+    "name": "Emily Johnson",
+    "age": 35
+  }
+]
+```
+Result
+
+![image](https://github.com/user-attachments/assets/de1fabfa-e735-458b-bb0b-b32a67ba22da)
+
