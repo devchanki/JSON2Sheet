@@ -1,109 +1,52 @@
 package org.chanki;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.net.URL;
 import java.util.List;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import lombok.NoArgsConstructor;
+import org.chanki.dataSource.DataSource;
+import org.chanki.dataSource.DataSourceFactory;
 
+@NoArgsConstructor
 public class Json2Sheet {
 
-  public OutputStream convertJsonToExcelWithKeyListReturnStream(File file, List<String> keyList) throws Exception {
-    JsonParser jsonParser = new JsonParser().builder().file(file).build().initialize();
+  private DataSource dataSource;
 
-    JsonNode jsonNode = jsonParser.getRootNode();
-
-    Workbook workbook = new XSSFWorkbook();
-    Sheet sheet = workbook.createSheet("data");
-
-    // 주어진 리스트로 헤더 생성
-    Row headerRow = sheet.createRow(0);
-    int cellNum = 0;
-    for (String header : keyList) {
-      Cell cell = headerRow.createCell(cellNum++);
-      cell.setCellValue(header);
-    }
-
-    int rowNum = 1;
-
-    for (JsonNode node : jsonNode) {
-      Row row = sheet.createRow(rowNum++);
-      int _cellNum = 0;
-      for(String key: keyList) {
-        Cell cell = row.createCell(_cellNum++);
-        cell.setCellValue(String.valueOf(node.get(key)));
-      }
-    }
-    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    workbook.write(outputStream);
-    return outputStream;
+  private Json2Sheet(DataSource dataSource) {
+    this.dataSource = dataSource;
   }
 
-  public void convertJsonToExcelWithKeyToSaveFile(File file, String filePath, List<String> keyList) throws Exception {
-    JsonParser jsonParser = new JsonParser().builder().file(file).build().initialize();
+  public static Json2Sheet fromJSON(String filePath) throws Exception {
+    DataSource dataSource = DataSourceFactory.fromJson(filePath);
+    return new Json2Sheet(dataSource);
+  }
 
-    JsonNode jsonNode = jsonParser.getRootNode();
+  public static Json2Sheet fromJSON(File file) throws Exception {
+    DataSource dataSource = DataSourceFactory.fromJson(file);
+    return new Json2Sheet(dataSource);
+  }
 
+  public static Json2Sheet fromJSON(InputStream inputStream) throws Exception {
+    DataSource dataSource = DataSourceFactory.fromJson(inputStream);
+    return new Json2Sheet(dataSource);
+  }
+
+  public static Json2Sheet fromJSON(URL url) throws Exception {
+    DataSource dataSource = DataSourceFactory.fromJson(url);
+    return new Json2Sheet(dataSource);
+  }
+  public static Json2Sheet fromPOJO(List<?> pojoList) throws Exception {
+    DataSource dataSource = DataSourceFactory.fromPojo(pojoList);
+    return new Json2Sheet(dataSource);
+  }
+
+  public void saveExcel(String filePath) throws Exception {
     ExcelManager excelManager = new ExcelManager();
-    excelManager.saveWorkBookWithJsonNode(jsonNode, keyList, filePath);
+    ExcelDataForm data = this.dataSource.parseToList();
+    excelManager.saveWorkBook(data, filePath != null ? filePath : "default.xlsx");
   }
 
-  // Header 가 될 키를 전체 Json 순회 후 Key를 계산 후 Excel 헤더 만듬.
-  public void convertJsonToExcelToFilePath(File file, String filePath) throws Exception{
-    JsonParser jsonParser = new JsonParser().builder().file(file).build().initialize();
 
-    JsonNode jsonNode = jsonParser.getRootNode();
-    List<String> keyList = jsonParser.getJsonObjectKeyList();
-
-    ExcelManager excelManager = new ExcelManager();
-    excelManager.saveWorkBookWithJsonNode(jsonNode, keyList, filePath);
-  }
-
-  public void convertJsonToExcelToFilePath(String jsonPath, String filePath) throws Exception{
-    JsonParser jsonParser = new JsonParser().builder().path(jsonPath).build().initialize();
-    JsonNode jsonNode = jsonParser.getRootNode();
-    List<String> keyList = jsonParser.getJsonObjectKeyList();
-
-    ExcelManager excelManager = new ExcelManager();
-    excelManager.saveWorkBookWithJsonNode(jsonNode, keyList, filePath);
-  }
-
-  public void convertJsonToExcelToFilePath(InputStream stream, String filePath) throws Exception{
-    JsonParser jsonParser = new JsonParser().builder().inputStream(stream).build().initialize();
-    JsonNode jsonNode = jsonParser.getRootNode();
-    List<String> keyList = jsonParser.getJsonObjectKeyList();
-
-    ExcelManager excelManager = new ExcelManager();
-    excelManager.saveWorkBookWithJsonNode(jsonNode, keyList, filePath);
-
-  }
-
-  public void convertHttpResponseJsonToExcelToFilePath(String url, String filePath) throws Exception{
-    JsonParser jsonParser = new JsonParser().builder().url(url).build().initialize();
-    JsonNode jsonNode = jsonParser.getRootNode();
-    List<String> keyList = jsonParser.getJsonObjectKeyList();
-
-    ExcelManager excelManager = new ExcelManager();
-    excelManager.saveWorkBookWithJsonNode(jsonNode, keyList, filePath);
-  }
-
-  public void convertJsonToExcel(JsonNode jsonNode, List<String> keyList, String fileName)
-      throws IOException {
-    ExcelManager excelManager = new ExcelManager();
-    excelManager.saveWorkBookWithJsonNode(jsonNode, keyList, fileName);
-  }
-
-  public void convertJsonFileToExcel(JsonNode jsonNode, List<String> keyList, String fileName)
-      throws IOException {
-    ExcelManager excelManager = new ExcelManager();
-    excelManager.saveWorkBookWithJsonNode(jsonNode, keyList, fileName);
-  }
 
 }

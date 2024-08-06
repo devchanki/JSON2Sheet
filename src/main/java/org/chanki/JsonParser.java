@@ -1,66 +1,46 @@
 package org.chanki;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import lombok.Builder;
-
+import org.chanki.dataSource.JsonDataSource;
 
 public class JsonParser {
-  JsonNode rootNode;
-  File file;
-  String path;
-  InputStream inputStream;
-  String url;
 
-  @Builder
-  public JsonParser JsonParser(File file, String path, InputStream inputStream, String url) {
-    this.file = file;
-    this.path = path;
-    this.inputStream = inputStream;
-    this.url = url;
+  JsonNode jsonNode;
 
-    return this;
+  public JsonParser(JsonNode jsonNode) {
+    this.jsonNode = jsonNode;
   }
 
-  public JsonParser initialize() throws Exception{
-    if(this.rootNode == null) {
-      ObjectMapper objectMapper = new ObjectMapper();
-      if(this.file != null) {
-        this.rootNode = objectMapper.readTree(this.file);
-      } else if (this.path != null) {
-        File jsonFile = new File(this.path);
-        this.rootNode = objectMapper.readTree(jsonFile);
-      } else if (this.inputStream != null) {
-        this.rootNode = objectMapper.readTree(this.inputStream);
-      } else if (this.url != null) {
-        try(InputStream is = new URL(url).openStream()) {
-          this.rootNode = objectMapper.readTree(is);
-        }
-      }
-    } else {
-      throw new IOException("Cannot Found Json Info");
-    }
-
-    return this;
+  public JsonParser(String path) throws Exception {
+    this.jsonNode = new JsonDataSource(path).getJsonNode();
   }
 
-  public JsonNode getRootNode() {
-    return this.rootNode;
+  public JsonParser(URL url) throws Exception {
+    this.jsonNode = new JsonDataSource(url).getJsonNode();
   }
 
   public ArrayList<String> getJsonObjectKeyList() {
-    if(rootNode == null) throw new Error("No Json Data Set");
+    if (this.jsonNode == null) {
+      throw new Error("No Json Data Set");
+    }
 
-    Set<String> keyList = new LinkedHashSet<String>();
-    collectKeyList(this.rootNode, keyList);
+    Set<String> keyList = new LinkedHashSet<>();
+    collectKeyList(this.jsonNode, keyList);
     return new ArrayList<>(keyList);
+  }
+
+  public List<Map<String, Object>> getJsonListMap() throws Exception {
+    return new ObjectMapper().readValue(this.jsonNode.traverse(),
+        new TypeReference<>() {
+        });
   }
 
   private void collectKeyList(JsonNode node, Set<String> keyList) {
