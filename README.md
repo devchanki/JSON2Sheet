@@ -6,19 +6,26 @@ JSON 을 받아 엑셀 문서를 만드는 라이브러리
 # 사용법
 ### URL
 
+org.chanki.examples.url package
+
 ``` JAVA
-Json2Sheet json2Sheet = new Json2Sheet();
-// URL, FilePath + FileName
-json2Sheet.convertHttpResponseJsonToExcelToFilePath("https://jsonplaceholder.typicode.com/comments", "test.xlsx");
+  public static void main(String[] args) throws Exception {
+    Json2Sheet json2Sheet = Json2Sheet.fromJSON(new URL("https://jsonplaceholder.typicode.com/comments"));
+    json2Sheet.saveExcel("listByUrl.xlsx");
+  }
 ```
+
+[URL 내 데이터 미리보기](https://jsonplaceholder.typicode.com/comments)
+
 Result
-![image](https://github.com/user-attachments/assets/ecaf973b-4d68-482b-b57a-d6951c152566)
+![image](https://github.com/user-attachments/assets/ba3d37dc-3259-49a0-9613-0fa4efdc27a3)
+
 
 ### File 경로
 
 ``` JAVA
-    Json2Sheet json2Sheet = new Json2Sheet();
-    json2Sheet.convertJsonToExcelToFilePath("./test.json", "testWithFile.xlsx");
+    Json2Sheet json2Sheet1 = Json2Sheet.fromJSON("./test.json");
+    json2Sheet1.saveExcel("hello1.xlsx");
 ```
 
 test.json
@@ -40,5 +47,15 @@ test.json
 ```
 Result
 
-![image](https://github.com/user-attachments/assets/de1fabfa-e735-458b-bb0b-b32a67ba22da)
+![image](https://github.com/user-attachments/assets/c41c92bd-fab6-4f1b-9005-4fa7827c7898)
+
+
+### POJO List
+
+org.chanki.examples.pojo package
+
+![image](https://github.com/user-attachments/assets/7ace608c-a3e9-41c7-931b-5fbba9992444)
+
+Result
+![image](https://github.com/user-attachments/assets/603a6e91-a8ff-4f62-b056-489c252ac60e)
 
