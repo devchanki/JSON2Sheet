@@ -39,7 +39,7 @@ public class JsonParser {
 
   public List<Map<String, Object>> getJsonListMap() throws Exception {
     return new ObjectMapper().readValue(this.jsonNode.traverse(),
-        new TypeReference<>() {
+        new TypeReference<List<Map<String, Object>>>() {
         });
   }
 

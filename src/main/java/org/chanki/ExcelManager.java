@@ -32,7 +32,7 @@ public class ExcelManager {
     for (Map<String, Object> rowItem : rowData) {
       Row row = sheet.createRow(rowNum++);
       int _cellNum = 0;
-      for(var key: keyList) {
+      for(String key: keyList) {
         Cell cell = row.createCell(_cellNum++);
         cell.setCellValue(rowItem.get(key).toString());
       }
